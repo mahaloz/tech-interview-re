@@ -27,5 +27,5 @@ def contains(prefix: str, resource: str) -> bool:
     clean_resource = canonical_path(resource)
     if clean_prefix == "/":
         return True
-    return clean_resource == clean_prefix or clean_resource.startswith(clean_prefix + "/")
+    return clean_resource.startswith(clean_prefix)
 
