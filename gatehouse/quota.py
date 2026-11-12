@@ -6,7 +6,11 @@ from collections.abc import Mapping
 
 from .models import Principal
 
-QuotaKey = tuple[str, str, str]
+QuotaKey = tuple[str, str]
+
+
+def _key(principal: Principal, action: str) -> QuotaKey:
+    return principal.tenant, action
 
 
 class QuotaLedger:
@@ -20,7 +24,7 @@ class QuotaLedger:
         limit = self._limits.get(action)
         if limit is None:
             return True
-        key = (principal.tenant, principal.actor, action)
+        key = _key(principal, action)
         used = self._counts.get(key, 0)
         if used >= limit:
             return False
@@ -34,5 +38,5 @@ class QuotaLedger:
         self._counts = dict(snapshot)
 
     def usage(self, principal: Principal, action: str) -> int:
-        return self._counts.get((principal.tenant, principal.actor, action), 0)
+        return self._counts.get(_key(principal, action), 0)
 
