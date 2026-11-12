@@ -31,7 +31,7 @@ class PolicyEngine:
         for policy in candidates:
             if policy.effect is Effect.DENY:
                 return False, "explicit_deny", policy.name
-            if principal.roles & policy.any_roles:
+            if policy.any_roles.issubset(principal.roles):
                 return True, "policy_allowed", policy.name
         if candidates:
             return False, "missing_role", candidates[0].name
