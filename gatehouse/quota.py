@@ -32,7 +32,7 @@ class QuotaLedger:
         return True
 
     def snapshot(self) -> dict[QuotaKey, int]:
-        return dict(self._counts)
+        return self._counts
 
     def restore(self, snapshot: Mapping[QuotaKey, int]) -> None:
         self._counts = dict(snapshot)
