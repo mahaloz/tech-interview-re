@@ -16,10 +16,15 @@ def _required(data: Mapping[str, Any], name: str, expected: type) -> Any:
     return value
 
 
+def _string_list(data: Mapping[str, Any], name: str) -> list[str]:
+    value = data.get(name)
+    if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
+        raise ValueError(f"{name} must be a list of strings")
+    return value
+
+
 def decode_principal(data: Mapping[str, Any]) -> Principal:
-    roles = data.get("roles", [])
-    if not isinstance(roles, list) or not all(isinstance(role, str) for role in roles):
-        raise ValueError("roles must be a list of strings")
+    roles = _string_list(data, "roles") if "roles" in data else []
     return Principal(
         tenant=_required(data, "tenant", str),
         actor=_required(data, "actor", str),
@@ -39,12 +44,8 @@ def decode_session(data: Mapping[str, Any]) -> Session:
 
 
 def decode_policy(data: Mapping[str, Any]) -> Policy:
-    actions = data.get("actions")
-    roles = data.get("any_roles")
-    if not isinstance(actions, list) or not all(isinstance(item, str) for item in actions):
-        raise ValueError("actions must be a list of strings")
-    if not isinstance(roles, list) or not all(isinstance(item, str) for item in roles):
-        raise ValueError("any_roles must be a list of strings")
+    actions = _string_list(data, "actions")
+    roles = _string_list(data, "any_roles")
     try:
         effect = Effect(data.get("effect", "allow"))
     except ValueError as exc:
