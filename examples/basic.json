@@ -1,0 +1,36 @@
+{
+  "policies": [
+    {
+      "name": "documents-readers",
+      "tenant": "acme",
+      "resource_prefix": "/documents",
+      "actions": ["read"],
+      "any_roles": ["reader", "admin"]
+    }
+  ],
+  "sessions": [
+    {
+      "token": "alice-token",
+      "expires_at": 5000,
+      "principal": {
+        "tenant": "acme",
+        "actor": "alice",
+        "roles": ["reader"]
+      }
+    }
+  ],
+  "quota_limits": {"read": 3},
+  "operations": [
+    {
+      "op": "request",
+      "request": {
+        "request_id": "demo-1",
+        "session_token": "alice-token",
+        "action": "read",
+        "resource": "/documents/report",
+        "now": 1000
+      }
+    }
+  ]
+}
+
