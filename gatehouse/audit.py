@@ -14,6 +14,14 @@ def _digest(previous: str, payload: Mapping[str, object]) -> str:
     return hashlib.sha256(f"{previous}:{encoded}".encode()).hexdigest()
 
 
+def _payload(entry: Mapping[str, object]) -> dict[str, object]:
+    return {key: value for key, value in entry.items() if key != "digest"}
+
+
+def _valid_link(previous: str, entry: Mapping[str, object]) -> bool:
+    return entry.get("digest") == _digest(previous, _payload(entry))
+
+
 class AuditLog:
     def __init__(self) -> None:
         self._entries: list[dict[str, object]] = []
@@ -38,8 +46,7 @@ class AuditLog:
     def verify(self) -> bool:
         previous = "0" * 64
         for entry in self._entries:
-            payload = {key: value for key, value in entry.items() if key != "digest"}
-            if entry.get("digest") != _digest(previous, payload):
+            if not _valid_link(previous, entry):
                 return False
             previous = str(entry["digest"])
         return True
